@@ -87,12 +87,12 @@ attack_recipes = {
     "textfooler": TextFoolerJin2019,
     "pso": PSOZang2020,
     "iga": IGAWang2019,
-    "GA": GeneticAlgorithmAlzantot2018,
-    "wordbugger": DeepWordBugGao2018,
+    "ga": GeneticAlgorithmAlzantot2018,
+    "deepwordbug": DeepWordBugGao2018,
     'clare': CLARE2020,
 }
 
-for attacker in ["pwws", "bae", "textfooler", "pso", "wordbugger", 'clare']:
+for attacker in ["pwws", "bae", "textfooler", "deepwordbug"]:
     for dataset in [
         "agnews10k",
         "amazon",
@@ -392,8 +392,7 @@ with demo:
         ". RPD significantly (>10% defense accuracy improvement) outperforms the state-of-the-art methods."
     )
     gr.Markdown(
-        "- The DeepWordBug, IGA, GA, PSO, and CLARE attackers are very slow on CPU Devices."
-        " And they are unknown attackers to RPD's adversarial detector. "
+        "- The DeepWordBug is an unknown attacker to RPD's adversarial detector, which shows the robustness of RPD."
     )
 
     gr.Markdown("## <p align='center'>Natural Example Input</p>")
@@ -409,9 +408,7 @@ with demo:
                     "BAE",
                     "PWWS",
                     "TextFooler",
-                    "WordBugger",
-                    "PSO",
-                    "CLARE",
+                    "DeepWordBug"
                 ],
                 value="TextFooler",
                 label="Choose an Adversarial Attacker for generating an adversarial example to attack the model.",
