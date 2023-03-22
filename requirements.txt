@@ -16,4 +16,4 @@ transformers>4.20.0
 torch>1.0.0
 sentencepiece
 tensorflow_text
-textattack
+textattack[tensorflow]

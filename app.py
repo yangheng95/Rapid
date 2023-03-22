@@ -18,6 +18,7 @@ from textattack.attack_recipes import (
     IGAWang2019,
     GeneticAlgorithmAlzantot2018,
     DeepWordBugGao2018,
+    CLARE2020,
 )
 from textattack.attack_results import SuccessfulAttackResult
 from textattack.datasets import Dataset
@@ -88,9 +89,10 @@ attack_recipes = {
     "iga": IGAWang2019,
     "GA": GeneticAlgorithmAlzantot2018,
     "wordbugger": DeepWordBugGao2018,
+    'clare': CLARE2020,
 }
 
-for attacker in ["pwws", "bae", "textfooler"]:
+for attacker in ["pwws", "bae", "textfooler", "pso", "wordbugger", 'clare']:
     for dataset in [
         "agnews10k",
         "amazon",
@@ -389,7 +391,10 @@ with demo:
         "- To our best knowledge, Reactive Perturbation Defocusing is a novel approach in adversarial defense "
         ". RPD significantly (>10% defense accuracy improvement) outperforms the state-of-the-art methods."
     )
-
+    gr.Markdown(
+        "- The DeepWordBug, IGA, GA, PSO, and CLARE attackers are very slow on CPU Devices."
+        " And they are unknown attackers to RPD's adversarial detector. "
+    )
 
     gr.Markdown("## <p align='center'>Natural Example Input</p>")
     with gr.Group():
@@ -400,7 +405,14 @@ with demo:
                 label="Select a testing dataset and an adversarial attacker to generate an adversarial example.",
             )
             input_attacker = gr.Radio(
-                choices=["BAE", "PWWS", "TextFooler"],
+                choices=[
+                    "BAE",
+                    "PWWS",
+                    "TextFooler",
+                    "WordBugger",
+                    "PSO",
+                    "CLARE",
+                ],
                 value="TextFooler",
                 label="Choose an Adversarial Attacker for generating an adversarial example to attack the model.",
             )
@@ -413,7 +425,6 @@ with demo:
                 input_label = gr.Textbox(
                     placeholder="Original label...", label="Original Label"
                 )
-
 
     button_gen = gr.Button(
         "Generate an adversarial example and repair using RPD (No GPU, Time:3-10 mins )",
@@ -432,11 +443,14 @@ with demo:
                 output_adv_example = gr.Textbox(label="Adversarial Example")
                 output_adv_label = gr.Textbox(label="Perturbed Label")
             with gr.Row():
-                output_repaired_example = gr.Textbox(label="Repaired Adversarial Example by RPD")
+                output_repaired_example = gr.Textbox(
+                    label="Repaired Adversarial Example by RPD"
+                )
                 output_repaired_label = gr.Textbox(label="Repaired Label")
 
-
-    gr.Markdown("## <p align='center'>The Output of Reactive Perturbation Defocusing</p>")
+    gr.Markdown(
+        "## <p align='center'>The Output of Reactive Perturbation Defocusing</p>"
+    )
     with gr.Group():
         output_is_adv_df = gr.DataFrame(label="Adversarial Example Detection Result")
         gr.Markdown(
@@ -444,9 +458,7 @@ with demo:
             "The perturbed_label is the predicted label of the adversarial example. "
             "The confidence field represents the confidence of the predicted adversarial example detection. "
         )
-        output_df = gr.DataFrame(
-            label="Repaired Standard Classification Result"
-        )
+        output_df = gr.DataFrame(label="Repaired Standard Classification Result")
         gr.Markdown(
             "If is_repaired=true, it has been repaired by RPD. "
             "The pred_label field indicates the standard classification result. "
@@ -454,20 +466,19 @@ with demo:
             "The is_correct field indicates whether the predicted label is correct."
         )
 
-
     gr.Markdown("## <p align='center'>Example Comparisons</p>")
     ori_text_diff = gr.HighlightedText(
-            label="The Original Natural Example",
-            combine_adjacent=True,
-        )
+        label="The Original Natural Example",
+        combine_adjacent=True,
+    )
     adv_text_diff = gr.HighlightedText(
-            label="Character Editions of Adversarial Example Compared to the Natural Example",
-            combine_adjacent=True,
-        )
+        label="Character Editions of Adversarial Example Compared to the Natural Example",
+        combine_adjacent=True,
+    )
     restored_text_diff = gr.HighlightedText(
-            label="Character Editions of Repaired Adversarial Example Compared to the Natural Example",
-            combine_adjacent=True,
-        )
+        label="Character Editions of Repaired Adversarial Example Compared to the Natural Example",
+        combine_adjacent=True,
+    )
 
     # Bind functions to buttons
     button_gen.click(

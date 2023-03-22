@@ -4,7 +4,6 @@ from textattack.shared.utils import ReprMixin
 
 
 class ReactiveDefender(ReprMixin, ABC):
-
     def __init__(self, **kwargs):
         pass
 
