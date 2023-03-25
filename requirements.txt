@@ -21,3 +21,4 @@ jieba
 pycld2
 OpenHowNet
 pinyin
+flask

@@ -2,7 +2,7 @@
 *.cache
 *.dev.py
 state_dict/
-
+TAD*/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
