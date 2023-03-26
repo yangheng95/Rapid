@@ -99,7 +99,7 @@ def get_sst2_example():
                     label = int(label.strip())
                     data.append((text, label))
                     label_set.add(label)
-        return data[random.randint(0, len(data))]
+        return random.choice(data)
 
 
 def get_agnews_example():
@@ -142,7 +142,7 @@ def get_agnews_example():
                     label = int(label.strip())
                     data.append((text, label))
                     label_set.add(label)
-        return data[random.randint(0, len(data))]
+        return random.choice(data)
 
 
 def get_amazon_example():
@@ -186,7 +186,7 @@ def get_amazon_example():
                     label = int(label.strip())
                     data.append((text, label))
                     label_set.add(label)
-        return data[random.randint(0, len(data))]
+        return random.choice(data)
 
 
 def get_imdb_example():
@@ -230,5 +230,5 @@ def get_imdb_example():
                     label = int(label.strip())
                     data.append((text, label))
                     label_set.add(label)
-        return data[random.randint(0, len(data))]
+        return random.choice(data)
 

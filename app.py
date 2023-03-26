@@ -188,18 +188,19 @@ if __name__ == "__main__":
     - The adversarial example and repaired adversarial example may be unnatural to read, while it is because the attackers usually generate unnatural perturbations. RPD does not introduce additional unnatural perturbations.
     - To our best knowledge, Reactive Perturbation Defocusing is a novel approach in adversarial defense. RPD significantly (>10% defense accuracy improvement) outperforms the state-of-the-art methods.
     - The DeepWordBug is an unknown attacker to the adversarial detector and reactive defense module. DeepWordBug has different attacking patterns from other attackers and shows the generalizability and robustness of RPD.
+    - To help the review & evaluation of ACL2023, we will host this demo on a GPU device to speed up the inference process in the next month. Then it will be deployed on a CPU device in the future.
     """)
         gr.Markdown("<h2 align='center'>Natural Example Input</h2>")
         with gr.Group():
             with gr.Row():
                 input_dataset = gr.Radio(
                     choices=["SST2", "AGNews10K", "Amazon"],
-                    value="Amazon",
+                    value="SST2",
                     label="Select a testing dataset and an adversarial attacker to generate an adversarial example.",
                 )
                 input_attacker = gr.Radio(
                     choices=["BAE", "PWWS", "TextFooler", "DeepWordBug"],
-                    value="TextFooler",
+                    value="PWWS",
                     label="Choose an Adversarial Attacker for generating an adversarial example to attack the model.",
                 )
             with gr.Group():
@@ -213,7 +214,7 @@ if __name__ == "__main__":
                     )
 
         button_gen = gr.Button(
-            "Generate an adversarial example to repair using RPD (it will takes 1-10 minutes because no GPU is available)",
+            "Generate an adversarial example to repair using RPD (GPU: < 1 minute, CPU: 1-10 minutes)",
             variant="primary",
         )
 
