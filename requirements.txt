@@ -16,7 +16,10 @@ transformers>4.20.0
 torch>1.0.0
 sentencepiece
 tensorflow_text
-textattack[dev]
+tensorflow_hub
+tensorflow>=2.6.0
+datasets
+textattack
 jieba
 pycld2
 OpenHowNet
