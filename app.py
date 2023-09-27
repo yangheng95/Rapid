@@ -124,8 +124,8 @@ def generate_adversarial_example(dataset, attacker, text=None, label=None):
             }[result["is_adv_label"]]
             advdetection_df["perturbed_label"] = result["perturbed_label"]
             advdetection_df["confidence"] = round(result["is_adv_confidence"], 3)
-            # advdetection_df['ref_is_attack'] = result['ref_is_adv_label']
-            # advdetection_df['is_correct'] = result['ref_is_adv_check']
+            advdetection_df['ref_is_attack'] = result['ref_is_adv_label']
+            advdetection_df['is_correct'] = result['ref_is_adv_check']
 
     else:
         return generate_adversarial_example(dataset, attacker)
@@ -186,24 +186,23 @@ def check_gpu():
 
 
 if __name__ == "__main__":
-    init()
+    # init()
 
     demo = gr.Blocks()
 
     with demo:
-        gr.Markdown("<h1 align='center'>Reactive Perturbation Defocusing for Textual Adversarial Defense</h1>")
+        gr.Markdown("<h1 align='center'>Reactive Perturbation Defocusing (Rapid) for Textual Adversarial Defense</h1>")
         gr.Markdown("""
-    - This demo has no mechanism to ensure the adversarial example will be correctly repaired by Rapid. The repair success rate is actually the performance reported in the paper (approximately up to 97%).
+    - This demo has no mechanism to ensure the adversarial example will be correctly repaired by Rapid. The repair success rate is actually the performance reported in the paper.
     - The adversarial example and repaired adversarial example may be unnatural to read, while it is because the attackers usually generate unnatural perturbations. Rapid does not introduce additional unnatural perturbations.
     - To our best knowledge, Reactive Perturbation Defocusing is a novel approach in adversarial defense. Rapid significantly (>10% defense accuracy improvement) outperforms the state-of-the-art methods.
     - The DeepWordBug is an unknown attacker to the adversarial detector and reactive defense module. DeepWordBug has different attacking patterns from other attackers and shows the generalizability and robustness of Rapid.
-    - To help the review & evaluation of EMNLP-2023, we will host this demo on a GPU device to speed up the inference process d. Then it will be deployed on a CPU device in the future.
     """)
         gr.Markdown("<h2 align='center'>Natural Example Input</h2>")
         with gr.Group():
             with gr.Row():
                 input_dataset = gr.Radio(
-                    choices=["SST2", "AGNews10K", "Amazon"],
+                    choices=["SST2", "AGNews10K", "Yahoo", "Amazon"],
                     value="SST2",
                     label="Select a testing dataset and an adversarial attacker to generate an adversarial example.",
                 )
@@ -259,7 +258,7 @@ if __name__ == "__main__":
                     )
                     output_repaired_label = gr.Textbox(label="Predicted Label of the Repaired Adversarial Example")
 
-        gr.Markdown("<h2 align='center'>Example Difference (Comparisons)</p>")
+        gr.Markdown("<h2 align='center'>Example Comparisons</p>")
         gr.Markdown("""
         <p align='center'>The (+) and (-) in the boxes indicate the added and deleted characters in the adversarial example compared to the original input natural example.</p>
             """)
@@ -321,4 +320,4 @@ if __name__ == "__main__":
             ],
         )
 
-    demo.queue(2).launch()
+    demo.queue(concurrency_count=10).launch()
