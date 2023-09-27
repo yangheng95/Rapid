@@ -21,8 +21,6 @@ from textattack.attack_recipes import (
 from textattack.attack_results import SuccessfulAttackResult
 from utils import SentAttacker, get_agnews_example, get_sst2_example, get_amazon_example, get_imdb_example, diff_texts
 
-nltk.download("omw-1.4")
-
 sent_attackers = {}
 tad_classifiers = {}
 
@@ -41,6 +39,8 @@ app = Flask(__name__)
 
 
 def init():
+    nltk.download("omw-1.4")
+
     if not os.path.exists("TAD-SST2"):
         z = zipfile.ZipFile("checkpoints.zip", "r")
         z.extractall(os.getcwd())
@@ -146,7 +146,6 @@ def generate_adversarial_example(dataset, attacker, text=None, label=None):
 
 
 def run_demo(dataset, attacker, text=None, label=None):
-
     try:
         data = {
             "dataset": dataset,
@@ -174,21 +173,31 @@ def run_demo(dataset, attacker, text=None, label=None):
         print(e)
         return generate_adversarial_example(dataset, attacker, text, label)
 
-if __name__ == "__main__":
 
+def check_gpu():
+    try:
+        response = requests.post('https://rpddemo.pagekite.me/api/generate_adversarial_example', timeout=3)
+        if response.status_code < 500:
+            return 'GPU available'
+        else:
+            return 'GPU not available'
+    except Exception as e:
+        return 'GPU not available'
+
+
+if __name__ == "__main__":
     init()
 
     demo = gr.Blocks()
 
     with demo:
         gr.Markdown("<h1 align='center'>Reactive Perturbation Defocusing for Textual Adversarial Defense</h1>")
-        gr.Markdown("<h3 align='center'>Clarifications</h2>")
         gr.Markdown("""
-    - This demo has no mechanism to ensure the adversarial example will be correctly repaired by RPD. The repair success rate is actually the performance reported in the paper (approximately up to 97%).
-    - The adversarial example and repaired adversarial example may be unnatural to read, while it is because the attackers usually generate unnatural perturbations. RPD does not introduce additional unnatural perturbations.
-    - To our best knowledge, Reactive Perturbation Defocusing is a novel approach in adversarial defense. RPD significantly (>10% defense accuracy improvement) outperforms the state-of-the-art methods.
-    - The DeepWordBug is an unknown attacker to the adversarial detector and reactive defense module. DeepWordBug has different attacking patterns from other attackers and shows the generalizability and robustness of RPD.
-    - To help the review & evaluation of ACL2023, we will host this demo on a GPU device to speed up the inference process in the next month. Then it will be deployed on a CPU device in the future.
+    - This demo has no mechanism to ensure the adversarial example will be correctly repaired by Rapid. The repair success rate is actually the performance reported in the paper (approximately up to 97%).
+    - The adversarial example and repaired adversarial example may be unnatural to read, while it is because the attackers usually generate unnatural perturbations. Rapid does not introduce additional unnatural perturbations.
+    - To our best knowledge, Reactive Perturbation Defocusing is a novel approach in adversarial defense. Rapid significantly (>10% defense accuracy improvement) outperforms the state-of-the-art methods.
+    - The DeepWordBug is an unknown attacker to the adversarial detector and reactive defense module. DeepWordBug has different attacking patterns from other attackers and shows the generalizability and robustness of Rapid.
+    - To help the review & evaluation of EMNLP-2023, we will host this demo on a GPU device to speed up the inference process d. Then it will be deployed on a CPU device in the future.
     """)
         gr.Markdown("<h2 align='center'>Natural Example Input</h2>")
         with gr.Group():
@@ -207,15 +216,31 @@ if __name__ == "__main__":
                 with gr.Row():
                     input_sentence = gr.Textbox(
                         placeholder="Input a natural example...",
-                        label="Alternatively, input a natural example and its original label to generate an adversarial example.",
+                        label="Alternatively, input a natural example and its original label (from above datasets) to generate an adversarial example.",
                     )
                     input_label = gr.Textbox(
-                        placeholder="Original label...", label="Original Label"
+                        placeholder="Original label, must be an integer...", label="Original Label"
                     )
 
         button_gen = gr.Button(
-            "Generate an adversarial example to repair using RPD (GPU: < 1 minute, CPU: 1-10 minutes)",
+            "Generate an adversarial example to repair using Rapid (GPU: < 1 minute, CPU: 1-10 minutes)",
             variant="primary",
+        )
+        gpu_status_text = gr.Textbox(
+            label='GPU status',
+            placeholder="Please click to check",
+        )
+        button_check = gr.Button(
+            "Check if GPU available",
+            variant="primary"
+        )
+
+        button_check.click(
+            fn=check_gpu,
+            inputs=[],
+            outputs=[
+                gpu_status_text
+            ]
         )
 
         gr.Markdown("<h2 align='center'>Generated Adversarial Example and Repaired Adversarial Example</h2>")
@@ -230,14 +255,14 @@ if __name__ == "__main__":
                     output_adv_label = gr.Textbox(label="Predicted Label of the Adversarial Example")
                 with gr.Row():
                     output_repaired_example = gr.Textbox(
-                        label="Repaired Adversarial Example by RPD"
+                        label="Repaired Adversarial Example by Rapid"
                     )
                     output_repaired_label = gr.Textbox(label="Predicted Label of the Repaired Adversarial Example")
 
         gr.Markdown("<h2 align='center'>Example Difference (Comparisons)</p>")
         gr.Markdown("""
-    <p align='center'>The (+) and (-) in the boxes indicate the added and deleted characters in the adversarial example compared to the original input natural example.</p>
-        """)
+        <p align='center'>The (+) and (-) in the boxes indicate the added and deleted characters in the adversarial example compared to the original input natural example.</p>
+            """)
         ori_text_diff = gr.HighlightedText(
             label="The Original Natural Example",
             combine_adjacent=True,
@@ -271,7 +296,7 @@ if __name__ == "__main__":
                         label="Repaired Standard Classification Result"
                     )
                     gr.Markdown(
-                        "If is_repaired=true, it has been repaired by RPD. "
+                        "If is_repaired=true, it has been repaired by Rapid. "
                         "The pred_label field indicates the standard classification result. "
                         "The confidence field represents the confidence of the predicted label. "
                         "The is_correct field indicates whether the predicted label is correct."
@@ -297,4 +322,3 @@ if __name__ == "__main__":
         )
 
     demo.queue(2).launch()
-
